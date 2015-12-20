@@ -1,0 +1,5 @@
+---
+# In nginx confs supporting ACME, write down "include snippets/acme_well_known.conf;"
+- name: Create global ACME location directive
+  template: src=acme_well_known.conf dest=/etc/nginx/snippets/acme_well_known.conf
+
