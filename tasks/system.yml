@@ -1,0 +1,35 @@
+---
+- name: Ensure that our ACME user exists
+  user:
+    name: "{{ acme_user }}"
+    createhome: no
+- name: Setup our base SSL folder
+  file:
+    path: "{{ ssl_base_folder | mandatory }}"
+    state: directory
+    owner: "{{ acme_user }}"
+    group: www-data
+    mode: 0750
+- name: Clone acme_tiny
+  git:
+    repo: https://github.com/diafygi/acme-tiny.git
+    dest: "{{ ssl_base_folder }}/acme-tiny"
+  become: yes
+  become_user: "{{ acme_user }}"
+- name: Ensure that we have a letsencrypt account key
+  shell: "openssl genrsa 4096 > {{ ssl_base_folder }}/account.key"
+  args:
+    creates: "{{ ssl_base_folder }}/account.key"
+- name: setup account key perms
+  file:
+    path: "{{ ssl_base_folder }}/account.key"
+    owner: "{{ acme_user }}"
+    mode: 0600
+- name: Setup challenges folder
+  file:
+    path: "{{ acme_challenges_folder_path | mandatory }}"
+    state: directory
+    owner: "{{ acme_user }}"
+    group: www-data
+    mode: 0750
+

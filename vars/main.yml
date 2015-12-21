@@ -1,2 +1,6 @@
 ---
+acme_user: acme
+ssl_base_folder: ""
 acme_challenges_folder_path: ""
+# A list of domains to run acme_tiny on
+acme_domains: []

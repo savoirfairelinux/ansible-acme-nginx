@@ -1,2 +1,4 @@
 ---
+- include: system.yml
 - include: nginx.yml
+- include: domains.yml
