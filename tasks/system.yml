@@ -1,4 +1,11 @@
 ---
+- name: Ensure packages needed for basic ACME provisioning are present
+  apt: name={{ item }} state=latest
+  with_items:
+    - openssl
+    - git
+    - sudo
+    - nginx
 - name: Ensure that our ACME user exists
   user:
     name: "{{ acme_user }}"

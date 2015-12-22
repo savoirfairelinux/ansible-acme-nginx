@@ -2,4 +2,10 @@
 # In nginx confs supporting ACME, write down "include snippets/acme_well_known.conf;"
 - name: Create global ACME location directive
   template: src=acme_well_known.conf dest=/etc/nginx/snippets/acme_well_known.conf
-
+# see https://weakdh.org/sysadmin.html
+- name: Create a strong dhparam.pem
+  shell: openssl dhparam -out /etc/nginx/dhparams.pem 2048
+  args:
+    creates: /etc/nginx/dhparams.pem
+- name: Create dhparam nginx conf
+  template: src=stronger_dhparams.conf dest=/etc/nginx/conf.d/stronger_dhparams.conf
