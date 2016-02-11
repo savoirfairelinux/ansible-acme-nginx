@@ -1,4 +1,6 @@
 ---
 - include: system.yml
 - include: nginx.yml
-- include: domains.yml
+- include: domain.yml
+  with_items: "{{ acme_domains }}"
+

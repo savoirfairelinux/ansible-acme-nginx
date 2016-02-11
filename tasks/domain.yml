@@ -1,0 +1,59 @@
+---
+- name: "Setup SSL domains folders for {{ item }}"
+  file:
+    path: "{{ ssl_base_folder }}/{{ item }}"
+    state: directory
+    owner: "{{ acme_user }}"
+    group: www-data
+    mode: 0750
+- name: Ensure that a domain private key exists
+  shell: "openssl genrsa 4096 > {{ ssl_base_folder }}/{{ item }}/domain.key"
+  args:
+    creates: "{{ ssl_base_folder }}/{{ item }}/domain.key"
+  become: yes
+  become_user: "{{ acme_user }}"
+- name: setup domain private key perms
+  file:
+    path: "{{ ssl_base_folder }}/{{ item }}/domain.key"
+    owner: "{{ acme_user }}"
+    group: www-data
+    mode: 0640
+- name: Do we have a certificate?
+  stat: "path={{ ssl_base_folder }}/{{ item }}/chained.pem"
+  register: cert_stat
+- name: Is certificate too old?
+  find:
+    paths: "{{ ssl_base_folder }}/{{ item }}"
+    pattern: "chained.pem"
+    age: 30d
+  register: cert_age_find
+- block:
+  - name: Ensure that we have a domain CSR
+    shell: "openssl req -new -sha256 -key {{ ssl_base_folder }}/{{ item }}/domain.key -subj \"/CN={{ item }}\" > {{ ssl_base_folder }}/{{ item }}/domain.csr"
+  - name: Sign our CSR with acme-tiny
+    shell: >
+      python3 {{ ssl_base_folder }}/acme-tiny/acme_tiny.py
+      --account-key "{{ ssl_base_folder }}/account.key"
+      --csr "{{ ssl_base_folder }}/{{ item }}/domain.csr"
+      --acme-dir "{{ acme_challenges_folder_path }}"
+      > {{ ssl_base_folder }}/{{ item }}/signed.crt
+  - name: Fetch Lets Encrypt intermediate cert
+    get_url:
+      url: https://letsencrypt.org/certs/lets-encrypt-x1-cross-signed.pem
+      dest: "{{ ssl_base_folder }}/{{ item }}/intermediate.pem"
+      force: yes
+  - name: Create fullchain cert
+    shell: "cat signed.crt intermediate.pem > chained.pem"
+    args:
+      chdir: "{{ ssl_base_folder }}/{{ item }}"
+  - name: setup domain fullchain perms
+    file:
+      path: "{{ ssl_base_folder }}/{{ item }}/chained.pem"
+      owner: "{{ acme_user }}"
+      group: www-data
+      mode: 0640
+    become: no
+  become: yes
+  become_user: "{{ acme_user }}"
+  when: cert_age_find.matched > 0 or not cert_stat.stat.exists
+
