@@ -46,6 +46,7 @@
     shell: "cat signed.crt intermediate.pem > chained.pem"
     args:
       chdir: "{{ ssl_base_folder }}/{{ item }}"
+    notify: nginx restart
   - name: setup domain fullchain perms
     file:
       path: "{{ ssl_base_folder }}/{{ item }}/chained.pem"
