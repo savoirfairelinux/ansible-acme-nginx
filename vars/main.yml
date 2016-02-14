@@ -1,6 +1,10 @@
 ---
+# user under which we run acme-tiny and owner of ssl_base_folder
 acme_user: acme
+# Path where we put all our SSL private keys and certificates
 ssl_base_folder: ""
+# Path where we tell acme-tiny to put our challenges. Writable by acme_user and readable by
+# www-data (nginx)
 acme_challenges_folder_path: ""
-# A list of domains to run acme_tiny on
+# A list of domains to run acme_tiny on. Example: "www.example.com"
 acme_domains: []
