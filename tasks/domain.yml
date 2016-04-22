@@ -39,7 +39,7 @@
       > {{ ssl_base_folder }}/{{ item }}/signed.crt
   - name: Fetch Lets Encrypt intermediate cert
     get_url:
-      url: https://letsencrypt.org/certs/lets-encrypt-x1-cross-signed.pem
+      url: https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem
       dest: "{{ ssl_base_folder }}/{{ item }}/intermediate.pem"
       force: yes
   - name: Create fullchain cert
