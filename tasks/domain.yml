@@ -27,33 +27,7 @@
     pattern: "chained.pem"
     age: 30d
   register: cert_age_find
-- block:
-  - name: Ensure that we have a domain CSR
-    shell: "openssl req -new -sha256 -key {{ ssl_base_folder }}/{{ item }}/domain.key -subj \"/CN={{ item }}\" > {{ ssl_base_folder }}/{{ item }}/domain.csr"
-  - name: Sign our CSR with acme-tiny
-    shell: >
-      python3 {{ ssl_base_folder }}/acme-tiny/acme_tiny.py
-      --account-key "{{ ssl_base_folder }}/account.key"
-      --csr "{{ ssl_base_folder }}/{{ item }}/domain.csr"
-      --acme-dir "{{ acme_challenges_folder_path }}"
-      > {{ ssl_base_folder }}/{{ item }}/signed.crt
-  - name: Fetch Lets Encrypt intermediate cert
-    get_url:
-      url: https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem
-      dest: "{{ ssl_base_folder }}/{{ item }}/intermediate.pem"
-      force: yes
-  - name: Create fullchain cert
-    shell: "cat signed.crt intermediate.pem > chained.pem"
-    args:
-      chdir: "{{ ssl_base_folder }}/{{ item }}"
-    notify: nginx restart
-  - name: setup domain fullchain perms
-    file:
-      path: "{{ ssl_base_folder }}/{{ item }}/chained.pem"
-      owner: "{{ acme_user }}"
-      group: www-data
-      mode: 0640
-    become: no
+- include: sign.yml
   become: yes
   become_user: "{{ acme_user }}"
   when: cert_age_find.matched > 0 or not cert_stat.stat.exists

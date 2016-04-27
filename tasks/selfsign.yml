@@ -1,0 +1,3 @@
+---
+- name: Self-signing our CSR
+  shell: "openssl x509 -req -days 365 -in {{ ssl_base_folder }}/{{ item }}/domain.csr -signkey {{ ssl_base_folder }}/{{ item }}/domain.key -out {{ ssl_base_folder }}/{{ item }}/chained.pem"

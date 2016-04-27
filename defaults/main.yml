@@ -8,3 +8,5 @@ ssl_base_folder: ""
 acme_challenges_folder_path: ""
 # A list of domains to run acme_tiny on. Example: "www.example.com"
 acme_domains: []
+# If enabled, we self-sign our private keys instead of asking Let's Encrypt
+acme_self_sign: no
