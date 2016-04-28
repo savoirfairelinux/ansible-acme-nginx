@@ -2,6 +2,9 @@
 # In nginx confs supporting ACME, write down "include snippets/acme_well_known.conf;"
 - name: Create global ACME location directive
   template: src=acme_well_known.conf dest=/etc/nginx/snippets/acme_well_known.conf
+- name: Create catchall server that responds to ACME challenges
+  template: src=challenge_catchall.conf dest=/etc/nginx/sites-enabled/acme_challenge_catchall.conf
+  notify: nginx restart
 # see https://weakdh.org/sysadmin.html
 - name: Create a strong dhparam.pem
   shell: openssl dhparam -out /etc/nginx/dhparams.pem 2048

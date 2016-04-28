@@ -1,29 +1,31 @@
 ---
+- set_fact:
+    current_domain_folder: "{{ ssl_base_folder }}/{{ item }}"
 - name: "Setup SSL domains folders for {{ item }}"
   file:
-    path: "{{ ssl_base_folder }}/{{ item }}"
+    path: "{{ current_domain_folder }}"
     state: directory
     owner: "{{ acme_user }}"
     group: www-data
     mode: 0750
 - name: Ensure that a domain private key exists
-  shell: "openssl genrsa 4096 > {{ ssl_base_folder }}/{{ item }}/domain.key"
+  shell: "openssl genrsa 4096 > {{ current_domain_folder }}/domain.key"
   args:
-    creates: "{{ ssl_base_folder }}/{{ item }}/domain.key"
+    creates: "{{ current_domain_folder }}/domain.key"
   become: yes
   become_user: "{{ acme_user }}"
 - name: setup domain private key perms
   file:
-    path: "{{ ssl_base_folder }}/{{ item }}/domain.key"
+    path: "{{ current_domain_folder }}/domain.key"
     owner: "{{ acme_user }}"
     group: www-data
     mode: 0640
 - name: Do we have a certificate?
-  stat: "path={{ ssl_base_folder }}/{{ item }}/chained.pem"
+  stat: "path={{ current_domain_folder }}/chained.pem"
   register: cert_stat
 - name: Is certificate too old?
   find:
-    paths: "{{ ssl_base_folder }}/{{ item }}"
+    paths: "{{ current_domain_folder }}"
     pattern: "chained.pem"
     age: 30d
   register: cert_age_find
@@ -31,4 +33,6 @@
   become: yes
   become_user: "{{ acme_user }}"
   when: cert_age_find.matched > 0 or not cert_stat.stat.exists
+- name: Generate nginx snippet for domain-specific SSL conf
+  template: src=domain_ssl.conf dest=/etc/nginx/snippets/{{ item }}.ssl.conf
 
