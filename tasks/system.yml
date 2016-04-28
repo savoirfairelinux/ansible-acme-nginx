@@ -6,6 +6,7 @@
     - git
     - sudo
     - nginx
+    - python3
 - name: Ensure that our ACME user exists
   user:
     name: "{{ acme_user }}"
