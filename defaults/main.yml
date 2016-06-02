@@ -5,7 +5,7 @@ acme_user: acme
 acme_ssl_base_folder: /var/ssl
 # Path where we tell acme-tiny to put our challenges. Writable by acme_user and readable by
 # www-data (nginx)
-acme_challenges_folder_path: "{{ ssl_base_folder }}/challenges"
+acme_challenges_folder_path: "{{ acme_ssl_base_folder }}/challenges"
 # A list of domains to run acme_tiny on. Example: "www.example.com"
 acme_domains: []
 # If enabled, we self-sign our private keys instead of asking Let's Encrypt
