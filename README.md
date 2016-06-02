@@ -18,7 +18,7 @@ is how your role invocation will look like:
 - hosts: webserver
   roles:
     - role: ansible-acme-nginx
-      ssl_base_folder: /opt/mysslstuff
+      acme_ssl_base_folder: /opt/mysslstuff
       acme_challenges_folder_path: "{{ ssl_base_folder }}/challenges"
       acme_domains:
         - example.com

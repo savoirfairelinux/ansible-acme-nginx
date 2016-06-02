@@ -1,6 +1,6 @@
 ---
 - set_fact:
-    current_domain_folder: "{{ ssl_base_folder }}/{{ item }}"
+    current_domain_folder: "{{ acme_ssl_base_folder }}/{{ item }}"
 - name: "Setup SSL domains folders for {{ item }}"
   file:
     path: "{{ current_domain_folder }}"

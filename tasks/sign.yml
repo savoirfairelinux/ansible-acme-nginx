@@ -1,6 +1,6 @@
 ---
 - name: Ensure that we have a domain CSR
-  shell: "openssl req -new -sha256 -key {{ ssl_base_folder }}/{{ item }}/domain.key -subj \"/CN={{ item }}\" > {{ ssl_base_folder }}/{{ item }}/domain.csr"
+  shell: "openssl req -new -sha256 -key {{ acme_ssl_base_folder }}/{{ item }}/domain.key -subj \"/CN={{ item }}\" > {{ acme_ssl_base_folder }}/{{ item }}/domain.csr"
 - include: acme.yml
   when: not acme_self_sign
 - include: selfsign.yml
