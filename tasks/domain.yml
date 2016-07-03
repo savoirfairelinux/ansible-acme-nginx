@@ -1,38 +1,44 @@
----
 - set_fact:
-    current_domain_folder: "{{ acme_ssl_base_folder }}/{{ item }}"
-- name: "Setup SSL domains folders for {{ item }}"
+    current_domain_folder: "{{ acme_ssl_base_folder }}/{{ current_domain|mandatory }}"
+
+- name: "Setup SSL domains folders for {{ current_domain }}"
   file:
     path: "{{ current_domain_folder }}"
     state: directory
     owner: "{{ acme_user }}"
     group: www-data
     mode: 0750
+
 - name: Ensure that a domain private key exists
   shell: "openssl genrsa 4096 > {{ current_domain_folder }}/domain.key"
   args:
     creates: "{{ current_domain_folder }}/domain.key"
   become: yes
   become_user: "{{ acme_user }}"
+
 - name: setup domain private key perms
   file:
     path: "{{ current_domain_folder }}/domain.key"
     owner: "{{ acme_user }}"
     group: www-data
     mode: 0640
+   
 - name: Do we have a certificate?
   stat: "path={{ current_domain_folder }}/chained.pem"
   register: cert_stat
+
 - name: Is certificate too old?
   find:
     paths: "{{ current_domain_folder }}"
     pattern: "chained.pem"
     age: 30d
   register: cert_age_find
+
 - include: sign.yml
   become: yes
   become_user: "{{ acme_user }}"
   when: cert_age_find.matched > 0 or not cert_stat.stat.exists
+
 - name: Generate nginx snippet for domain-specific SSL conf
-  template: src=domain_ssl.conf dest=/etc/nginx/snippets/{{ item }}.ssl.conf
+  template: src=domain_ssl.conf dest=/etc/nginx/snippets/{{ current_domain }}.ssl.conf
 

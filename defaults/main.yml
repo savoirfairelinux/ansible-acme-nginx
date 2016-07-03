@@ -6,7 +6,22 @@ acme_ssl_base_folder: /var/ssl
 # Path where we tell acme-tiny to put our challenges. Writable by acme_user and readable by
 # www-data (nginx)
 acme_challenges_folder_path: "{{ acme_ssl_base_folder }}/challenges"
-# A list of domains to run acme_tiny on. Example: "www.example.com"
+
+# A list of *simple* domains to run acme_tiny on. Example: "www.example.com"
+# For each of those domains, a CSR with a single domain will be created and processed.
 acme_domains: []
+
+# A list of domains that contains multiple subdomains in the same request.
+# The generated CSR will use SAN openssl configuration when generating the CSR.
+# See acme_tiny README.
+# Each item in this list is a hash with the same structure as _acme_multi_domains_item.
+acme_multi_domains: []
+
+# Example: {'top_domain': 'example.com', sub_hosts: ['', 'www']}
+# Note: the first sub hosts is the "main" host of the resulting cert.
+_acme_multi_domains_item:
+  top_domain: ''
+  sub_hosts: []
+
 # If enabled, we self-sign our private keys instead of asking Let's Encrypt
 acme_self_sign: no

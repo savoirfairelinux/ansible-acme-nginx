@@ -1,24 +1,26 @@
----
 - name: Sign our CSR with acme-tiny
   shell: >
     python3 {{ acme_ssl_base_folder }}/acme-tiny/acme_tiny.py
     --account-key "{{ acme_ssl_base_folder }}/account.key"
-    --csr "{{ acme_ssl_base_folder }}/{{ item }}/domain.csr"
+    --csr "{{ current_domain_folder }}/domain.csr"
     --acme-dir "{{ acme_challenges_folder_path }}"
-    > {{ acme_ssl_base_folder }}/{{ item }}/signed.crt
+    > {{ current_domain_folder }}/signed.crt
+
 - name: Fetch Lets Encrypt intermediate cert
   get_url:
     url: https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem
-    dest: "{{ acme_ssl_base_folder }}/{{ item }}/intermediate.pem"
+    dest: "{{ current_domain_folder }}/intermediate.pem"
     force: yes
+    
 - name: Create fullchain cert
   shell: "cat signed.crt intermediate.pem > chained.pem"
   args:
-    chdir: "{{ acme_ssl_base_folder }}/{{ item }}"
+    chdir: "{{ current_domain_folder }}"
   notify: nginx restart
+
 - name: setup domain fullchain perms
   file:
-    path: "{{ acme_ssl_base_folder }}/{{ item }}/chained.pem"
+    path: "{{ current_domain_folder }}/chained.pem"
     owner: "{{ acme_user }}"
     group: www-data
     mode: 0640

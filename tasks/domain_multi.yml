@@ -1,0 +1,4 @@
+- include: domain.yml
+  vars:
+    current_domain: "{{ item.top_domain }}"
+    current_sub_hosts: "{{ item.sub_hosts }}"
