@@ -11,17 +11,19 @@ acme_challenges_folder_path: "{{ acme_ssl_base_folder }}/challenges"
 # For each of those domains, a CSR with a single domain will be created and processed.
 acme_domains: []
 
-# A list of domains that contains multiple subdomains in the same request.
+# A list of domains that are grouped in the same request.
 # The generated CSR will use SAN openssl configuration when generating the CSR.
 # See acme_tiny README.
 # Each item in this list is a hash with the same structure as _acme_multi_domains_item.
 acme_multi_domains: []
 
-# Example: {'top_domain': 'example.com', sub_hosts: ['', 'www']}
-# Note: the first sub hosts is the "main" host of the resulting cert.
+# Example: {'base_name': 'example.com', domains: ['example.com', 'www.example.com']}
+# base_name will be the main name of the cert, that is, the name of the folder containing its
+# keys and certs as well as the name of the nginx snippet.
+# The first domain of "domains" is the "main" host of the resulting cert.
 _acme_multi_domains_item:
-  top_domain: ''
-  sub_hosts: []
+  base_name: ''
+  domains: []
 
 # If enabled, we self-sign our private keys instead of asking Let's Encrypt
 acme_self_sign: no

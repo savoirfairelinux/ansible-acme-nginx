@@ -5,7 +5,7 @@
 - include: domain.yml
   vars:
    current_domain: "{{ item }}" 
-   current_sub_hosts: []
+   current_sub_domains: []
   with_items: "{{ acme_domains }}"
 
 - include: domain_multi.yml

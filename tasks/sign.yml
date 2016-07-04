@@ -1,6 +1,6 @@
 - name: Ensure that we have a domain CSR (single mode)
   shell: "openssl req -new -sha256 -key {{ current_domain_folder }}/domain.key -subj \"/CN={{ current_domain }}\" > {{ current_domain_folder }}/domain.csr"
-  when: not current_sub_hosts
+  when: not current_sub_domains
 
 - block:
   - name: Generate openssl_san.cnf
@@ -14,7 +14,7 @@
   - name: Ensure that we have a domain CSR (multi mode)
     shell: "openssl req -new -sha256 -key {{ current_domain_folder }}/domain.key -subj \"/\" -reqexts SAN -config {{ current_domain_folder }}/openssl_concat.cnf > {{ current_domain_folder }}/domain.csr"
 
-  when: current_sub_hosts
+  when: current_sub_domains
 
 - include: acme.yml
   when: not acme_self_sign
