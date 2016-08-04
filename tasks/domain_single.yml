@@ -1,0 +1,7 @@
+- set_fact:
+    current_domain: "{{ item }}"
+
+- set_fact:
+    current_sub_domains: []
+
+- include: domain.yml
