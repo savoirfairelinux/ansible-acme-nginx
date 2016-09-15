@@ -28,10 +28,18 @@
   become: yes
   become_user: "{{ acme_user }}"
 
-- name: Ensure that we have a letsencrypt account key
-  shell: "openssl genrsa 4096 > {{ acme_ssl_base_folder }}/account.key"
-  args:
-    creates: "{{ acme_ssl_base_folder }}/account.key"
+- name: Check if the account.key file already exists
+  stat: path="{{ acme_ssl_base_folder }}/account.key"
+  register: account_key_file
+
+- name: Generates a letsencrypt account key if necessary
+  command: "openssl genrsa 4096"
+  register: account_key
+  when: not account_key_file.stat.exists
+
+- name: Copy the account key to the appropriate file
+  copy: content="{{ account_key.stdout }}" dest="{{ acme_ssl_base_folder }}/account.key"
+  when: account_key is defined and account_key.stdout is defined
 
 - name: setup account key perms
   file:
@@ -46,4 +54,3 @@
     owner: "{{ acme_user }}"
     group: www-data
     mode: 0750
-
