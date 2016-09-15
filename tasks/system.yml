@@ -28,6 +28,12 @@
   become: yes
   become_user: "{{ acme_user }}"
 
+# Why 3 actions instead of one? Previously, we would simply have a command redirecting its output
+# to account.key and that command had a "creates:" argument. The problem was that under some
+# conditions that could never be figured out, we would sometimes end up with an empty account.key
+# file and that this would break the whole role workflow. That action was split into 3 actions like
+# that to make sure that a failure in the openssl command doesn't create an empty account key file.
+
 - name: Check if the account.key file already exists
   stat: path="{{ acme_ssl_base_folder }}/account.key"
   register: account_key_file
