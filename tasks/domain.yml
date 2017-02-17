@@ -13,8 +13,10 @@
   shell: "openssl genrsa 4096 > {{ current_domain_folder }}/domain.key"
   args:
     creates: "{{ current_domain_folder }}/domain.key"
-  become: yes
-  become_user: "{{ acme_user }}"
+  when: acme_copy_from_hostname == ''
+
+- include: copy_from_hostname.yml
+  when: acme_copy_from_hostname != ''
 
 - name: setup domain private key perms
   file:

@@ -1,0 +1,22 @@
+---
+- name: fetch domain key
+  slurp:
+    src: "{{ current_domain_folder }}/domain.key"
+  register: slurped_domain_key
+  delegate_to: "{{ acme_copy_from_hostname }}"
+
+- name: fetch chained cert
+  slurp:
+    src: "{{ current_domain_folder }}/chained.pem"
+  register: slurped_chained_cert
+  delegate_to: "{{ acme_copy_from_hostname }}"
+
+- name: write domain key down
+  copy:
+    content: "{{ slurped_domain_key['content'] | b64decode }}"
+    dest: "{{ current_domain_folder }}/domain.key"
+
+- name: write chain cert down
+  copy:
+    content: "{{ slurped_chained_cert['content'] | b64decode }}"
+    dest: "{{ current_domain_folder }}/chained.pem"
