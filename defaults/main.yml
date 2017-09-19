@@ -39,3 +39,13 @@ acme_self_sign: no
 # process of transferring a host and you want to avoid the downtime between the moment where you
 # change your DNS record and the moment where you can proceed with a proper challenge.
 acme_copy_from_hostname: ''
+
+# When this is true, write a cronjob that will handle certificate renewal.
+acme_cron_renewal: true
+
+# Default renewal window size. This means that the ACME request in the cronjob will only run
+# when the certificate has less than this number of days before it expires.
+acme_cron_renewal_days: 7
+
+# Should the cronjob also reload nginx (as root) after certificate renewals?
+acme_cron_renewal_reload: true

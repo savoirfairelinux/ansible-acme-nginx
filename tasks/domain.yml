@@ -44,21 +44,19 @@
 - name: Generate nginx snippet for domain-specific SSL conf
   template: src=domain_ssl.conf dest=/etc/nginx/snippets/{{ current_domain }}.ssl.conf
 
-- name: setup cert renewal cronjob
+- name: Put renewal cron script
+  template:
+    src: cron.sh
+    dest: "{{ current_domain_folder }}/cron.sh"
+    owner: acme
+    mode: '0760'
+
+- name: Setup cert renewal cronjob
   cron:
     name: "{{ current_domain }}"
-    job: >
-      python3 {{ acme_ssl_base_folder }}/acme-tiny/acme_tiny.py
-      --account-key "{{ acme_ssl_base_folder }}/account.key"
-      --csr "{{ current_domain_folder }}/domain.csr"
-      --acme-dir "{{ acme_challenges_folder_path }}"
-      > {{ current_domain_folder }}/signed.crt
-      && cat {{ current_domain_folder }}/signed.crt
-      {{ current_domain_folder }}/intermediate.pem
-      > {{ current_domain_folder }}/chained.pem
-      && chown {{ acme_user }}:www-data {{ current_domain_folder }}/chained.pem
-      && chmod 0640 {{ current_domain_folder }}/chained.pem
+    job: "{{ current_domain_folder }}/cron.sh"
     hour: 1
     minute: 30
     day: "*"
     user: "{{ acme_user }}"
+  when: acme_cron_renewal

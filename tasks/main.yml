@@ -8,3 +8,12 @@
 - include: domain_multi.yml
   with_items: "{{ acme_multi_domains }}"
 
+- name: Setup nginx reload cronjob
+  cron:
+    name: "acme-nginx: Reload nginx"
+    job: "service nginx reload"
+    hour: 2
+    minute: 0
+    day: "*"
+    user: "root"
+  when: acme_cron_renewal_reload
