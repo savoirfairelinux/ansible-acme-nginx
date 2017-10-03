@@ -11,7 +11,7 @@
     url: https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem
     dest: "{{ current_domain_folder }}/intermediate.pem"
     force: yes
-    
+
 - name: Create fullchain cert
   shell: "cat signed.crt intermediate.pem > chained.pem"
   args:
@@ -25,4 +25,3 @@
     group: www-data
     mode: 0640
   become: no
-

@@ -24,7 +24,7 @@
     owner: "{{ acme_user }}"
     group: www-data
     mode: 0640
-   
+
 - name: Do we have a certificate?
   stat: "path={{ current_domain_folder }}/chained.pem"
   register: cert_stat
@@ -44,3 +44,19 @@
 - name: Generate nginx snippet for domain-specific SSL conf
   template: src=domain_ssl.conf dest=/etc/nginx/snippets/{{ current_domain }}.ssl.conf
 
+- name: Put renewal cron script
+  template:
+    src: cron.sh
+    dest: "{{ current_domain_folder }}/cron.sh"
+    owner: acme
+    mode: '0760'
+
+- name: Setup cert renewal cronjob
+  cron:
+    name: "{{ current_domain }}"
+    job: "{{ current_domain_folder }}/cron.sh"
+    hour: 1
+    minute: 30
+    day: "*"
+    user: "{{ acme_user }}"
+  when: acme_cron_renewal
